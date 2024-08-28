@@ -34,16 +34,26 @@ const Login = () => {
         const loginResponse = await axios.post(`${BaseURL}/login`, {
           username: email,
           password: password,
+        },{
+            withCredentials: true,
         });
+        console.log(loginResponse);
         if (loginResponse.status === 200) {
+          const cookies = loginResponse.headers['set-cookie'];
+          console.log('ccok' ,cookies);
+          const axiosInstance = axios.create({
+            headers: {
+              Cookie: cookies,
+            }
+          });
           const response = await axios.get(`${BaseURL}/users/me`, {
             params: {
               username: email,
               password: password,
             },
-
             withCredentials: true,
           });
+
 
           console.log(response.data);
           save({

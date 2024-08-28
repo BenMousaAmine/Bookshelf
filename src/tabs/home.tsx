@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { Book } from '../interface/Books.ts';
 import { BaseURL } from '../costants/environment.ts';
 import axios from 'axios';
+import CustomTabBarButton from "../component/CustomTabBarButton.tsx";
+import BookCard from "../component/cardBook.tsx";
 
 const Home: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -12,7 +14,9 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get(`${BaseURL}/books`);
+        const response = await axios.get(`${BaseURL}/books` , {
+            withCredentials: true,
+        })  ;
         setBooks(response.data);
       } catch (error) {
         console.error('Errore nel recupero dei libri:', error);
@@ -31,13 +35,15 @@ const Home: React.FC = () => {
         width: '100%',
       }}
     >
-      <Typography variant="h1" style={{ color: 'white', padding: '20px' }}>
+      <Typography variant="h2" style={{ color: 'white', padding: '20px' }}>
         Welcome back
       </Typography>
       <Typography variant="h3" style={{ color: 'white', padding: '20px' }}>
         Available books
       </Typography>
       <CardLoader />
+        <BookCard />
+        <CustomTabBarButton />
     </div>
   );
 };
