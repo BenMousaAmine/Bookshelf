@@ -6,17 +6,19 @@ import {
   Typography,
   Spinner,
 } from '@material-tailwind/react';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { BaseURL } from '../costants/environment.ts';
 import axios from 'axios';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { firstTime, save } from '../store/localstorage.ts';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -25,27 +27,23 @@ const Login = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setLoading(true);
     if (isValidEmail(email) && password.length >= 8) {
       try {
-        const loginResponse = await axios.post(`${BaseURL}/login`, {
-          username: email,
-          password: password,
-        },{
+        const loginResponse = await axios.post(
+          `${BaseURL}/login`,
+          {
+            username: email,
+            password: password,
+          },
+          {
             withCredentials: true,
-        });
-        console.log(loginResponse);
+          }
+        );
         if (loginResponse.status === 200) {
-          const cookies = loginResponse.headers['set-cookie'];
-          console.log('ccok' ,cookies);
-          const axiosInstance = axios.create({
-            headers: {
-              Cookie: cookies,
-            }
-          });
           const response = await axios.get(`${BaseURL}/users/me`, {
             params: {
               username: email,
@@ -54,8 +52,6 @@ const Login = () => {
             withCredentials: true,
           });
 
-
-          console.log(response.data);
           save({
             username: response.data.username,
             firstName: response.data.firstName,
@@ -67,7 +63,7 @@ const Login = () => {
             password: password,
           });
           firstTime();
-          //  router.push('/home');
+          navigate('/home');
         }
       } catch (error: unknown) {
         console.error(error);
@@ -192,10 +188,3 @@ const Login = () => {
 };
 
 export default Login;
-
-export const styleLogin = {
-  passwordEye: {
-    position: 'absolute',
-    right: 90,
-  },
-};

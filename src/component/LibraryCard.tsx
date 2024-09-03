@@ -4,10 +4,11 @@ import axios from 'axios';
 import { load } from '../store/localstorage.ts';
 import { BaseURL } from '../costants/environment.ts';
 import CardLoader from './cardLoader.tsx';
-import { BookCardProps } from '../interface/Books.ts';
+import { BookCardProps, LibraryCardProps } from '../interface/Books.ts';
 import { FaRegTrashAlt } from 'react-icons/fa';
+import login from '../auth/login.tsx';
 
-export const BookCard: React.FC<BookCardProps> = ({ book, pathDirctory }) => {
+const LibraryCard: React.FC<LibraryCardProps> = ({ book, onDelete }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [clickDetails, setClickDetails] = useState(false);
@@ -42,23 +43,24 @@ export const BookCard: React.FC<BookCardProps> = ({ book, pathDirctory }) => {
     fetchCover();
   }, []);
 
-  const handlePress = () => {
-    try {
-      setClickDetails(true);
-      navigate('/book', { state: { book } });
-      //  navigate(`/book/?book=${encodeURIComponent(JSON.stringify(book))}`);
-    } catch (error) {
-      console.error('Error navigating to book details:', error);
-    } finally {
-      setClickDetails(false);
-    }
+  const deleteBook = async (event: React.MouseEvent) => {
+    event.stopPropagation();
+    const downloadedBooks = localStorage.getItem('downloadedBooks');
+    const downloadedBooksArray = downloadedBooks
+      ? JSON.parse(downloadedBooks)
+      : [];
+    const newDownloadedBooks = downloadedBooksArray.filter(
+      (item: any) => item.id !== book.id
+    );
+    localStorage.setItem('downloadedBooks', JSON.stringify(newDownloadedBooks));
+    onDelete(book.id);
   };
 
   return (
     <>
       {cover ? (
         <div
-          onClick={() => handlePress()}
+          onClick={() => navigate('/reader/' + book.id)}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           className={`cursor-pointer ${isHovered ? 'bg-gray-200' : ''} p-4`}
@@ -66,11 +68,12 @@ export const BookCard: React.FC<BookCardProps> = ({ book, pathDirctory }) => {
         >
           <img src={cover} alt="Book Cover" className="w-full object-contain" />
 
-          {pathDirctory === 'home' && (
-            <button className="absolute bottom-28 right-6 bg-gray-600 hover:bg-gray-800 text-white rounded-full p-2 ">
-              <FaRegTrashAlt />
-            </button>
-          )}
+          <button
+            className="absolute bottom-28 right-6 bg-gray-600 hover:bg-gray-800 text-white rounded-full p-2 "
+            onClick={deleteBook}
+          >
+            <FaRegTrashAlt />
+          </button>
 
           <div className="mt-4 ">
             <h2 className="text-lg font-bold">
@@ -92,4 +95,4 @@ export const BookCard: React.FC<BookCardProps> = ({ book, pathDirctory }) => {
   );
 };
 
-export default BookCard;
+export default LibraryCard;

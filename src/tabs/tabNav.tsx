@@ -64,7 +64,7 @@ const TabNav = () => {
 const footerStyle = {
   position: 'fixed',
   bottom: 0,
-  width: '100vw',
+  width: '100%',
   backgroundColor: appColor.blue_title,
   color: 'white',
   borderTopLeftRadius: 12,

@@ -13,7 +13,6 @@ export interface BookCardProps {
 export interface LibraryCardProps {
   book: BookLibrary;
   onDelete: (id: string) => void;
-  handlePress: () => void;
 }
 
 export interface BookLibrary {
